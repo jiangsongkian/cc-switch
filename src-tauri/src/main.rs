@@ -2,6 +2,19 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
+    // Each app's SessionStart hook invokes this program with a hidden argument.
+    // Intercept it before Tauri initializes, or a GUI window would open.
+    let mut args = std::env::args().skip(1);
+    if let Some(first) = args.next() {
+        if first == "--cc-switch-rules-hook" {
+            let Some(app) = args.next() else {
+                eprintln!("cc-switch rules hook: missing app id");
+                std::process::exit(2);
+            };
+            std::process::exit(cc_switch_lib::run_rules_hook_cli(&app));
+        }
+    }
+
     // 在 Linux 上设置 WebKit 环境变量以解决 DMA-BUF 渲染问题
     // 某些 Linux 系统（如 Debian 13.2、Nvidia GPU）上 WebKitGTK 的 DMA-BUF 渲染器可能导致白屏/黑屏
     // 参考: https://github.com/tauri-apps/tauri/issues/9394
