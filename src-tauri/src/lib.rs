@@ -47,6 +47,8 @@ mod prompt_files;
 mod provider;
 mod provider_kind;
 mod proxy;
+mod rules;
+mod rules_hook;
 mod services;
 mod session_manager;
 mod settings;
@@ -65,6 +67,13 @@ mod window_fit;
 mod workbuddy_config;
 
 use crate::sync_utils::MutexExt;
+
+/// Hidden CLI entry point: invoked by each app's SessionStart hook to print the
+/// rules context. Handled before Tauri initializes so the whole GUI is not
+/// started.
+pub fn run_rules_hook_cli(app: &str) -> i32 {
+    rules_hook::run_cli(app)
+}
 pub use app_config::{AppType, InstalledSkill, McpApps, McpServer, MultiAppConfig, SkillApps};
 pub use codex_config::{
     extract_codex_experimental_bearer_token, get_codex_auth_path, get_codex_config_path,
@@ -825,6 +834,14 @@ pub fn run() {
             // 补完上次崩溃时写到一半的客户端文件（写前意图在 ~/.cc-switch/live-state.json），
             // 要在任何写客户端文件的启动步骤之前。
             crate::mode::operation::recover_on_startup(&app_state.db);
+
+            // Reproject rules from the database into each app directory at
+            // startup, using the database as truth after external edits or a
+            // previous crash. This must run after crash recovery: rules write
+            // hooks.json / Codex config.toml and must not race unfinished writes.
+            if let Err(error) = crate::services::rules::RuleService::sync_all(&app_state) {
+                log::warn!("Failed to sync rules on startup: {error}");
+            }
             // 上次退出或崩溃前没来得及删的 Claude 空值墓碑（切换时给开着的会话写的）接着删
             crate::services::provider::claude_direct::resume_tombstone_sweep();
 
@@ -1673,6 +1690,16 @@ pub fn run() {
             commands::list_pi_prompt_templates,
             commands::upsert_pi_prompt_template,
             commands::delete_pi_prompt_template,
+            // Rule management
+            commands::get_rules,
+            commands::create_rule,
+            commands::update_rule,
+            commands::delete_rule,
+            commands::toggle_rule_app,
+            commands::sync_rules,
+            commands::discover_rules,
+            commands::import_rules,
+            commands::get_rule_app_support,
             // Pi native provider and session views
             commands::get_pi_current_state,
             commands::update_pi_provider_usage_script,

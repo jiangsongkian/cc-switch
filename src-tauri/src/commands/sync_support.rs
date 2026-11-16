@@ -209,6 +209,9 @@ pub(crate) fn run_post_import_sync(app_state: &AppState) -> Result<(), AppError>
     if let Err(error) = PromptService::sync_all_to_live(app_state) {
         failures.push(format!("prompts: {error}"));
     }
+    if let Err(error) = crate::services::rules::RuleService::sync_all(app_state) {
+        failures.push(format!("rules: {error}"));
+    }
     if let Err(error) = model_pricing::sync_local_model_pricing(&app_state.db) {
         failures.push(format!("model pricing: {error}"));
     }

@@ -176,6 +176,11 @@ const SessionManagerPage = lazy(() =>
 const UsageScriptModal = lazy(() => import("@/components/UsageScriptModal"));
 const UnifiedMcpPanel = lazy(() => import("@/components/mcp/UnifiedMcpPanel"));
 const PromptPanel = lazy(() => import("@/components/prompts/PromptPanel"));
+const RulesPage = lazy(() =>
+  import("@/components/rules/RulesPage").then((m) => ({
+    default: m.RulesPage,
+  })),
+);
 const UnifiedSkillsPanel = lazy(
   () => import("@/components/skills/UnifiedSkillsPanel"),
 );
@@ -1843,6 +1848,8 @@ function App() {
         return (
           <UnifiedMcpPanel onInteractionBlockedChange={setMcpManagementBusy} />
         );
+      case "rules":
+        return <RulesPage />;
       case "skills":
       case "skillsDiscovery":
         // 「已安装 / 发现」合成一页；旧的 skillsDiscovery 视图直接打开「发现」段
