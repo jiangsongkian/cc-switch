@@ -465,6 +465,13 @@ export function NeutralBadge({
   );
 }
 
+// ─── Minimum table width ──────────────────────────────────────────────────
+// Checkbox + minimum name column + one column per app (MatrixCell's w-9) +
+// trailing "⋯" (w-10) + horizontal padding.
+export function matrixMinWidth(appCount: number): number {
+  return 8 + 24 + 8 + 240 + appCount * 36 + 40 + 8;
+}
+
 // ─── 可撤销的批量 toast ───────────────────────────────────────────────────
 export function showUndoToast(
   text: string,

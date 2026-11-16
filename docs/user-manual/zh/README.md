@@ -27,7 +27,8 @@
 │   ├── 3.2 Prompts 提示词管理
 │   ├── 3.3 Skills 技能管理
 │   ├── 3.4 会话管理器
-│   └── 3.5 工作区文件与每日记忆
+│   ├── 3.5 工作区文件与每日记忆
+│   └── 3.6 规则管理
 │
 ├── 4. 本地路由与高可用
 │   ├── 4.1 本地路由服务
@@ -76,6 +77,7 @@
 | [3.3-skills.md](./3-extensions/3.3-skills.md) | 发现技能、安装卸载、仓库管理 |
 | [3.4-sessions.md](./3-extensions/3.4-sessions.md) | 会话浏览、搜索过滤、恢复与删除 |
 | [3.5-workspace.md](./3-extensions/3.5-workspace.md) | OpenClaw 工作区文件、每日记忆 |
+| [3.6-rules.md](./3-extensions/3.6-rules.md) | 跨应用共享规则、按应用开关、各应用的规则机制（Claude Code、Codex、Gemini CLI、OpenCode） |
 
 ### 4. 本地路由与高可用
 

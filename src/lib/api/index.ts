@@ -6,6 +6,7 @@ export { backupsApi } from "./settings";
 export { mcpApi } from "./mcp";
 export { profilesApi } from "./profiles";
 export { promptsApi } from "./prompts";
+export { rulesApi } from "./rules";
 export { skillsApi } from "./skills";
 export { usageApi } from "./usage";
 export { subscriptionApi } from "./subscription";
@@ -18,6 +19,14 @@ export * as authApi from "./auth";
 export * as copilotApi from "./copilot";
 export type { ProviderSwitchEvent } from "./providers";
 export type { Prompt } from "./prompts";
+export type {
+  DiscoverableRule,
+  ImportRulesResult,
+  Rule,
+  RuleApps,
+  RuleAppSupport,
+  RuleInjection,
+} from "./rules";
 export type { Profile, ProfilePayload, ProfilesResponse } from "./profiles";
 export type { GitHubAccount } from "./copilot";
 export type {

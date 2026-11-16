@@ -17,6 +17,7 @@ import {
   Layers,
   LayoutGrid,
   Route,
+  ScrollText,
   Server,
   Settings,
   SlidersHorizontal,
@@ -276,6 +277,7 @@ function MainDirectory({
     { page: "mcp", label: "MCP", icon: Server },
     { page: "skills", label: "Skills", icon: SkillsIcon },
     { page: "prompts", label: t("nav.prompts"), icon: BookOpen },
+    { page: "rules", label: t("nav.rules"), icon: ScrollText },
     { page: "sessions", label: t("nav.sessions"), icon: History },
     {
       page: "auth",

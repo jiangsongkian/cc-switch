@@ -183,6 +183,60 @@ fn try_edit_config(
     Ok(true)
 }
 
+/// The glob for the rules directory in `instructions`. Use an absolute path so
+/// a relative path in the global config is not resolved against the current
+/// working directory; backslashes are unreliable in globs on Windows, so
+/// normalize them to forward slashes.
+fn rules_instructions_pattern() -> String {
+    let dir = get_opencode_dir().join("rules");
+    let mut path = dir.to_string_lossy().replace('\\', "/");
+    if !path.ends_with('/') {
+        path.push('/');
+    }
+    format!("{path}*.md")
+}
+
+/// Add or remove only cc-switch's own entry, preserving other instructions the
+/// user wrote.
+fn edit_rules_instructions(
+    config: &mut Value,
+    enabled: bool,
+    pattern: &str,
+) -> Result<(), AppError> {
+    let object = config
+        .as_object_mut()
+        .ok_or_else(|| AppError::Config("OpenCode config root must be a JSON object".into()))?;
+    let mut entries = match object.get("instructions") {
+        None => Vec::new(),
+        Some(Value::Array(entries)) => entries.clone(),
+        Some(_) => {
+            return Err(AppError::Config(
+                "OpenCode config \"instructions\" must be an array".into(),
+            ))
+        }
+    };
+    entries.retain(|entry| entry.as_str() != Some(pattern));
+    if enabled {
+        entries.push(Value::String(pattern.to_string()));
+    }
+    if entries.is_empty() {
+        object.shift_remove("instructions");
+    } else {
+        object.insert("instructions".to_string(), Value::Array(entries));
+    }
+    Ok(())
+}
+
+/// Reference or unreference the rules directory in the global config (step 3).
+/// [`try_edit_config`] preserves JSONC comments and formatting.
+pub fn set_rules_instructions(enabled: bool) -> Result<(), AppError> {
+    let pattern = rules_instructions_pattern();
+    try_edit_config(get_opencode_config_path, |config| {
+        edit_rules_instructions(config, enabled, &pattern)
+    })?;
+    Ok(())
+}
+
 pub fn get_providers() -> Result<Map<String, Value>, AppError> {
     Ok(get_providers_with_format()?
         .into_iter()
@@ -1529,5 +1583,29 @@ mod tests {
             assert!(document.save().is_err());
             assert_eq!(std::fs::read_to_string(&path).unwrap(), original);
         }
+    }
+
+    #[test]
+    fn rules_glob_is_added_and_removed_without_touching_user_entries() {
+        let pattern = "/home/me/.config/opencode/rules/*.md";
+        let mut config = json!({"instructions": ["CONTRIBUTING.md"]});
+
+        edit_rules_instructions(&mut config, true, pattern).unwrap();
+        assert_eq!(config["instructions"], json!(["CONTRIBUTING.md", pattern]));
+
+        // Enabling twice does not add a duplicate entry.
+        edit_rules_instructions(&mut config, true, pattern).unwrap();
+        assert_eq!(config["instructions"].as_array().unwrap().len(), 2);
+
+        edit_rules_instructions(&mut config, false, pattern).unwrap();
+        assert_eq!(config["instructions"], json!(["CONTRIBUTING.md"]));
+    }
+
+    #[test]
+    fn removing_the_only_rules_glob_drops_the_empty_array() {
+        let mut config = json!({});
+        edit_rules_instructions(&mut config, true, "rules/*.md").unwrap();
+        edit_rules_instructions(&mut config, false, "rules/*.md").unwrap();
+        assert!(config.get("instructions").is_none());
     }
 }

@@ -60,6 +60,7 @@ import {
   MatrixColumnHeader,
   MatrixColumnHighlight,
   MatrixSearch,
+  matrixMinWidth,
   NeutralBadge,
   ompDiscoveryColumnNote,
   resolveBulkScope,
@@ -79,12 +80,6 @@ import type { ZipSkippedSkill } from "@/lib/api/skills";
 import { APP_IDS_WITH } from "@/config/appSpecs";
 
 const BACKUP_DIR = "~/.cc-switch/skill-backups";
-
-// 表格最小宽度 = 勾选框 + 名称栏保底 + 每个应用一列（MatrixCell 的 w-9）+ 行尾「⋯」（w-10）+ 左右内边距
-const NAME_MIN_WIDTH = 240;
-const APP_COLUMN_WIDTH = 36;
-const matrixMinWidth = (appCount: number) =>
-  8 + 24 + 8 + NAME_MIN_WIDTH + appCount * APP_COLUMN_WIDTH + 40 + 8;
 
 type SkillsView = "installed" | "discover";
 type StatusFilter = "all" | "updates" | "none" | `app:${AppId}`;
