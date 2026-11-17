@@ -1,0 +1,15 @@
+{
+  "bundle": {
+    "macOS": {
+      "signingIdentity": "-"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDczRkEwODI1RUYwOUFFODEKUldTQnJnbnZKUWo2YzRwYTNLejZOaDRZN1MxRDFvc0l1S3RCeUdGRzdiQ0ZldCtnU290c0ZBWk4K",
+      "endpoints": [
+        "https://github.com/jiangsongkian/cc-switch/releases/latest/download/latest.json"
+      ]
+    }
+  }
+}
